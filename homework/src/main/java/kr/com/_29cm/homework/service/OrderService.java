@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +71,7 @@ public class OrderService {
 
 
     public int getTotalPrice(Long orderId) {
-        List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
+        List<OrderItem> orderItems = getOrderItems(orderId);
         int totalPrice = 0;
         for (OrderItem orderItem : orderItems) {
             totalPrice += orderItem.getTotalPrice();
@@ -79,4 +80,7 @@ public class OrderService {
 
     }
 
+    public List<OrderItem> getOrderItems(Long orderId) {
+        return orderItemRepository.findAllByOrderId(orderId);
+    }
 }
