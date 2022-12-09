@@ -15,8 +15,8 @@ public class Pay {
     @Column(name = "pay_id")
     private Long id;
 
-    @OneToOne(mappedBy = "pay", fetch = FetchType.LAZY)
-    private Order order;
+    @Column(name = "order_id")
+    private Long orderId;
 
 
 

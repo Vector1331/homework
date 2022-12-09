@@ -13,15 +13,20 @@ public class OrderItem {
     @Column(name = "order_item_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pid")
-    private Product product;
+    @Column(name = "product_id")
+    private Long pid;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @Column(name = "order_id")
+    private Long orderId;
 
     private int orderPrice;
     private int count;
+
+
+    /**
+     * 주문 아이템 가격  = 상품가격 * 주문 수
+     * */
+    public int getTotalPrice() {
+        return getOrderPrice() * getCount();
+    }
 }

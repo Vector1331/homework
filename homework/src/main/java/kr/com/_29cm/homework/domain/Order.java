@@ -16,14 +16,7 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems = new ArrayList<>();
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "pay_id")
-    private Pay pay;
-
-
-
+    @Column(name = "pay_id")
+    private Long payId;
 
 }
