@@ -27,7 +27,8 @@ public class OrderService {
     private final ProductRepository productRepository;
 
     /**
-     * 주문 생성*/
+     * 주문 생성
+     * */
     @Transactional
     public Long order(Long productId, int cnt) {
         Optional<Product> product = productRepository.findById(productId);
@@ -68,9 +69,7 @@ public class OrderService {
         return order;
     }
 
-
-
-    public int getTotalPrice(Long orderId) {
+    public int getOrderPrice(Long orderId) {
         List<OrderItem> orderItems = getOrderItems(orderId);
         int totalPrice = 0;
         for (OrderItem orderItem : orderItems) {
@@ -78,6 +77,14 @@ public class OrderService {
         }
         return totalPrice;
 
+    }
+
+    public int getPayPrice(Long orderId) {
+        int payPrice;
+        int orderPrice = getOrderPrice(orderId);
+        payPrice = orderPrice;
+        if(orderPrice < 50000) payPrice += 2500;
+        return payPrice;
     }
 
     public List<OrderItem> getOrderItems(Long orderId) {
