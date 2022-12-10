@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class Product {
-    @Id @GeneratedValue
+    @Id
     @Column(name = "pid")
     private Long id;
 
