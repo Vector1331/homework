@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.AssertionErrors.*;
 
 @SpringBootTest

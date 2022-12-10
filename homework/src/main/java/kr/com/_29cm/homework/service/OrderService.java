@@ -1,19 +1,11 @@
 package kr.com._29cm.homework.service;
 
-import kr.com._29cm.homework.domain.Order;
-import kr.com._29cm.homework.domain.OrderItem;
-import kr.com._29cm.homework.domain.Pay;
-import kr.com._29cm.homework.domain.Product;
+import kr.com._29cm.homework.domain.*;
 import kr.com._29cm.homework.exception.OrderException;
-import kr.com._29cm.homework.repository.OrderItemRepository;
-import kr.com._29cm.homework.repository.OrderRepository;
-import kr.com._29cm.homework.repository.ProductRepository;
+import kr.com._29cm.homework.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,14 +23,14 @@ public class OrderService {
      * */
     @Transactional
     public Long order(Long productId, int cnt) {
-        Optional<Product> product = productRepository.findById(productId);
+        Product product = productRepository.findById(productId);
         OrderItem orderItem = new OrderItem();
         Order order = createOrder();
 
-        if(product != Optional.<Product>empty()){
-            orderItem = createOrderItem(product.get().getId(), order.getId(), product.get().getPrice(), cnt);
+        if(product != null){
+            orderItem = createOrderItem(product.getId(), order.getId(), product.getPrice(), cnt);
         }
-        if(product == Optional.<Product>empty()) {
+        if(product == null) {
             throw new OrderException("OrderException 발생. 상품이 존재하지 않습니다. ");
         }
 
@@ -51,14 +43,14 @@ public class OrderService {
     public OrderItem createOrderItem(Long pid, Long orderId, int price, int cnt) {
         OrderItem orderItem = new OrderItem();
 
-        Optional<Product> product = productRepository.findById(pid);
-        if(product != Optional.<Product>empty()){
+        Product product = productRepository.findById(pid);
+        if(product != null){
             orderItem.setPid(pid);
             orderItem.setOrderId(orderId);
             orderItem.setOrderPrice(price);
             orderItem.setCount(cnt);
         }
-        product.get().removeStock(cnt);
+        product.removeStock(cnt);
         orderItemRepository.save(orderItem);
         return orderItem;
     }
