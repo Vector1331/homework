@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -13,8 +14,25 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public Optional<Product> findById (Long productId) {
+    public Product findById (Long productId) {
         return productRepository.findById(productId);
     };
+
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    public void printAll(){
+        List<Product> products = findAll();
+        for(Product product: products) {
+            System.out.println(product.getId() + "\t"
+                    + product.getName()+ "\t" +  product.getPrice()+ "\t" + product.getStock());
+        }
+    }
+
+    @Transactional
+    public void dataSave(){
+        productRepository.dataSave();
+    }
 
 }
