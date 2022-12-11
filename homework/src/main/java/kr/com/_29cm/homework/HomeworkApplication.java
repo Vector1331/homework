@@ -12,45 +12,44 @@ import org.springframework.stereotype.Component;
 @SpringBootApplication(scanBasePackages = "kr.com._29cm.homework")
 @Component
 public class HomeworkApplication {
-	ProductService productService;
-	/*static OrderApplication orderApp;
-
-	@Autowired
-	public HomeworkApplication(OrderApplication orderApp) {
-		this.orderApp = orderApp;
-	}*/
-
 	public static void main(String[] args) {
 
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(BeanConfig.class);
 		OrderApplication orderApplication = ctx.getBean(OrderApplication.class);
+		orderApplication.dataSave();
+
 		Scanner sc = new Scanner(System.in);
-
+		String choice = "o";
 		System.out.print("입력(o[order]: 주문, q[quit]: 종료) : ");
-		String choice = sc.next();
+		choice = sc.next();
 
-		if(!choice.equals("o") && !choice.equals("q")) throw new BaseException("입력이 주문 또는 종료가 아닙니다.");
-		if(choice.equals("o")) {
-			// 전체 상품 출력
-			orderApplication.orderStart();
+		while(choice.equals("o")){
+
+			if(!choice.equals("o") && !choice.equals("q")) throw new BaseException("입력이 주문 또는 종료가 아닙니다.");
+			if(choice.equals("o")) {
+				// 전체 상품 출력
+				orderApplication.orderStart();
+			}
+			// 주문할 상품번호 ,수량 입력받음
+			System.out.print("상품번호 : ");
+			int productId = sc.nextInt();
+			System.out.print("수량 : ");
+			int productCnt = sc.nextInt();
+			// 주문
+			Long orderId = orderApplication.order(productId, productCnt);
+
+			// 주문 내역(내용, 주문금액, 지불금액) 출력
+			if(orderId != 0L){
+				System.out.println("주문 내역 : ");
+				System.out.println("---------------------------------------");
+				orderApplication.orderDetail(orderId);
+			}
+			System.out.print("입력(o[order]: 주문, q[quit]: 종료) : ");
+			choice = sc.next();
 		}
-		// 주문할 상품번호 ,수량 입력받음
-		System.out.print("상품번호 : ");
-		int productId = sc.nextInt();
-		System.out.print("수량 : ");
-		int productCnt = sc.nextInt();
-		// 주문
-		Long orderId = orderApplication.order(productId, productCnt);
-
-		// 주문 내역(내용, 주문금액, 지불금액) 출력
-		if(orderId != 0L){
-			System.out.println("주문 내역 : ");
-			System.out.println("---------------------------------------");
-			orderApplication.orderDetail(orderId);
+		if(choice.equals("q")) {
+			System.out.println("고객님의 주문 감사합니다.");
 		}
-
-
-
 
 	}
 

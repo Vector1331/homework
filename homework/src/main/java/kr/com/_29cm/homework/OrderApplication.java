@@ -26,12 +26,13 @@ public class OrderApplication {
         this.productService = productService;
     }
 
-
-    public void orderStart() {
+    public void dataSave() {
         productService.dataSave();
 
-        productService.printAll();
+    }
 
+    public void orderStart() {
+        productService.printAll();
     }
 
 
