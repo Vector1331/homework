@@ -1,15 +1,11 @@
 package kr.com._29cm.homework;
-import java.util.List;
 import java.util.Scanner;
 
-import kr.com._29cm.homework.domain.Product;
 import kr.com._29cm.homework.exception.BaseException;
 import kr.com._29cm.homework.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 
@@ -35,9 +31,24 @@ public class HomeworkApplication {
 
 		if(!choice.equals("o") && !choice.equals("q")) throw new BaseException("입력이 주문 또는 종료가 아닙니다.");
 		if(choice.equals("o")) {
-			//orderApp.orderStart();
+			// 전체 상품 출력
 			orderApplication.orderStart();
 		}
+		// 주문할 상품번호 ,수량 입력받음
+		System.out.print("상품번호 : ");
+		int productId = sc.nextInt();
+		System.out.print("수량 : ");
+		int productCnt = sc.nextInt();
+		// 주문
+		Long orderId = orderApplication.order(productId, productCnt);
+
+		// 주문 내역(내용, 주문금액, 지불금액) 출력
+		if(orderId != 0L){
+			System.out.println("주문 내역 : ");
+			System.out.println("---------------------------------------");
+			orderApplication.orderDetail(orderId);
+		}
+
 
 
 

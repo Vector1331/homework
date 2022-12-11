@@ -24,6 +24,7 @@ public class ProductService {
 
     public void printAll(){
         List<Product> products = findAll();
+        System.out.printf("%2s \t %s %45s %6s \n", "상품번호 " , "상품명 " , "판매가격 " , "재고수 ");
         for(Product product: products) {
             System.out.println(product.getId() + "\t"
                     + product.getName()+ "\t" +  product.getPrice()+ "\t" + product.getStock());
