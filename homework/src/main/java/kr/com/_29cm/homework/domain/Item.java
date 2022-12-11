@@ -7,12 +7,11 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "product")
+@Table(name = "item")
 @Getter
 @Setter
-public class Product {
+public class Item {
     @Id
-    @Column(name = "pid")
     private Long id;
 
     private String name;
@@ -24,13 +23,13 @@ public class Product {
     /**
      * 재고 수량 감소
      * */
-    public void removeStock(int cnt) {
-        int leftStock = this.stock - cnt;
+    public void changeStock(int cnt) {
+        int leftStock = this.stock + cnt;
         if(leftStock < 0) {
             throw new SoldOutException("SoldOutException 발생. 주문한 상품량이 재고량보다 큽니다.");
         }
         this.stock = leftStock;
-
     }
+
 
 }

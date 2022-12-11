@@ -1,9 +1,8 @@
 package kr.com._29cm.homework;
 
+import kr.com._29cm.homework.domain.Order;
 import kr.com._29cm.homework.domain.OrderItem;
-import kr.com._29cm.homework.domain.Product;
 import kr.com._29cm.homework.service.OrderService;
-import kr.com._29cm.homework.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderApplication {
 
-    @Autowired
+   /* @Autowired
     ProductService productService;
 
     @Autowired
@@ -36,8 +35,8 @@ public class OrderApplication {
     }
 
 
-    public Long order(int productId, int productCnt) {
-        return orderService.order(Long.valueOf(productId), productCnt);
+    public Order order() {
+        return orderService.createOrder();
 
     }
 
@@ -68,4 +67,8 @@ public class OrderApplication {
         System.out.println("지불 금액 : " +  decimalFormat.format(payPrice) + "원") ;
         System.out.println("---------------------------------------");
     }
+
+    public void orderItem(int productId, Long orderId, int productCnt) {
+        orderService.createOrderItem(Long.valueOf(productId), orderId, productCnt);
+    }*/
 }

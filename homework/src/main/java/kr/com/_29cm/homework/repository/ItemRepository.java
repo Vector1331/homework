@@ -1,6 +1,6 @@
 package kr.com._29cm.homework.repository;
 
-import kr.com._29cm.homework.domain.Product;
+import kr.com._29cm.homework.domain.Item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,12 +11,12 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class ProductRepository{
+public class ItemRepository {
     private final EntityManager em;
 
     @Transactional
     public void dataSave() {
-        String sql = "INSERT INTO product(pid, name, price, stock) VALUES" +
+        String sql = "INSERT INTO product(id, name, price, stock) VALUES" +
                 " (768848,'[STANLEY] GO CERAMIVAC 진공 텀블러/보틀 3종',21000,45)" +
                 ",(748943,'디오디너리 데일리 세트 (Daily set)',19000,89)" +
                 ",(779989,'버드와이저 HOME DJing 굿즈 세트',35000,43)" +
@@ -40,13 +40,23 @@ public class ProductRepository{
         query.executeUpdate();
     }
 
-    public List<Product> findAll() {
-        return em.createQuery("select p from Product p", Product.class).getResultList();
+    public List<Item> findAll() {
+        return em.createQuery("select p from Item p", Item.class).getResultList();
     }
 
-    public Product findById(Long productId) {
-        return em.createQuery("select p from Product p where p.id = :pid", Product.class)
-                .setParameter("pid", productId)
+    public Item findById(Long itemId) {
+        return em.createQuery("select p from Item p where p.id = :id", Item.class)
+                .setParameter("id", itemId)
                 .getSingleResult();
+    }
+
+    public void save(Item item) {
+        em.persist(item);
+    }
+
+    public void saveAll(List<Item> items) {
+        for(Item item : items) {
+            save(item);
+        }
     }
 }

@@ -1,27 +1,49 @@
 package kr.com._29cm.homework.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import kr.com._29cm.homework.exception.SoldOutException;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 @Entity
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Slf4j
 public class OrderItem {
     @Id
     @GeneratedValue
     @Column(name = "order_item_id")
     private Long id;
 
-    @Column(name = "product_id")
-    private Long pid;
+    @Column(name = "item_id")
+    private Long itemId;
 
     @Column(name = "order_id")
     private Long orderId;
 
     private int orderPrice;
     private int count;
+    @Transient
+    private Item item;
 
+    public void changeItem(Item item) {
+        this.orderPrice = item.getPrice();
+        this.itemId = item.getId();
+        this.item = item;
+    }
+
+    public Item removeStock() {
+
+        item.changeStock(count * -1);
+
+        return item;
+    }
+
+    public void addStock() {
+        item.changeStock(count);
+    }
 
     /**
      * 주문 아이템 가격  = 상품가격 * 주문 수
@@ -29,4 +51,22 @@ public class OrderItem {
     public int getTotalPrice() {
         return getOrderPrice() * getCount();
     }
+
+    public void changeOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
+    public void printOrderItem() {
+        log.info("{} - {}개", item.getName(), count);
+    }
+
+//    public static OrderItem createOrderItem(Long pid, Long orderId, int orderPrice, int count) {
+//        OrderItem orderItem = new OrderItem();
+//        orderItem.setPid(pid);
+//        orderItem.setOrderId(orderId);
+//        orderItem.setOrderPrice(orderPrice);
+//        orderItem.setCount(count);
+//
+//        return orderItem;
+//    }
 }
