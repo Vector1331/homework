@@ -16,6 +16,9 @@
 
 <br> 
 
+### h2 연결 
+1. github repository의 H2 > bin > h2.bat 실행 (windows) 
+2. 데이터베이스 생성과 연결 진행 
  > 데이터베이스 생성 -> `jdbc:h2:~/productOrder (Embedded)`  <br>
  > 데이터베이스 연결 -> `jdbc:h2:tcp://localhost/~/productOrder (Server)`
 
