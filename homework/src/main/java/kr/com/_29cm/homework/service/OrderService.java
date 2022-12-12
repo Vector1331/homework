@@ -1,7 +1,6 @@
 package kr.com._29cm.homework.service;
 
 import kr.com._29cm.homework.domain.*;
-import kr.com._29cm.homework.exception.OrderException;
 import kr.com._29cm.homework.exception.SoldOutException;
 import kr.com._29cm.homework.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -22,43 +22,6 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final ItemRepository itemRepository;
 
-    /**
-     * 주문 생성
-     * */
-    /*@Transactional
-    public Order createOrder() {
-        Order order = new Order();
-        orderRepository.save(order);
-        return order;
-    }*/
-    /*public Long order(Long productId, int cnt ){
-        Order order = createOrder();
-        return order.getId();
-
-    }*/
-    /**
-     * 주문 아이템 생성
-     */
-/*    @Transactional
-    public void createOrderItem(Long pid, Long oid, int cnt) {
-        try {
-            Item item = productService.findById(pid);
-            OrderItem orderItem = OrderItem.createOrderItem(pid, oid, item.getPrice(), cnt);
-            try{
-                item.removeStock(cnt);
-                orderItemRepository.save(orderItem);
-                System.out.print(orderItem.getId());
-            }
-            catch (SoldOutException ex){
-                System.out.println("SoldOutException 발생. 주문한 상품량이 재고량보다 큽니다.");
-            }
-        }
-        catch (OrderException e) {
-            System.out.println("OrderException 발생, 상품이 존재하지 않습니다. ");
-        }
-        //return orderItem;
-    }
-    */
 
     @Transactional
     public void startOrder() {
@@ -94,7 +57,7 @@ public class OrderService {
                 } catch (Exception ex) {
                     log.error("주문에 실패했습니다. 다시 주문해주세요");
 
-                    // 주문 실패했으므로 item 재고 다시 add하고 save
+                    // 주문 실패했으므로 item 재고 다시 add & save
                     List<Item> items = orderItems.stream()
                             .map(m -> {
                                 m.addStock();
@@ -111,13 +74,15 @@ public class OrderService {
                     if (idInput.matches("^[0-9]*$") && cntInput.matches("^[0-9]*$")) {
                         OrderItem orderItem = order.addOrderItem(idInput, cntInput);
                         // item Id  아이템 조회 > 그 아이템 OrderItem set
-                        Item item = itemRepository.findById(Long.valueOf(idInput));
-                        if(item == null) {
+                        Optional<Item> foundItem = itemRepository.findById(Long.valueOf(idInput));
+                        if(Optional.<Item>empty() == foundItem) {
                             log.info("해당 상품은 없습니다. 다시입력해주세요");
                             continue;
                         }
+                        Item item = foundItem.get();
 
                         orderItem.changeItem(item);
+
                         try {
                             orderItem.removeStock();
                             itemRepository.save(item);

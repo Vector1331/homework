@@ -1,28 +1,17 @@
 package kr.com._29cm.homework.service;
 
 import kr.com._29cm.homework.domain.Item;
-import kr.com._29cm.homework.exception.OrderException;
 import kr.com._29cm.homework.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ItemService {
     private final ItemRepository itemRepository;
-
-    public Item findById (Long itemId) {
-        Item item = itemRepository.findById(itemId);
-        if(item == null) {
-            throw new OrderException();
-        }
-        return item;
-    };
 
     public List<Item> findAll() {
         return itemRepository.findAll();
@@ -30,7 +19,6 @@ public class ItemService {
 
     public void printAll(){
         List<Item> items = findAll();
-        //Todo : loginfo로변경
         log.info("%2s \t %s %45s %6s \n", "상품번호 " , "상품명 " , "판매가격 " , "재고수 ");
         for(Item item : items) {
             log.info(item.getId() + "\t"
@@ -38,9 +26,6 @@ public class ItemService {
         }
     }
 
-    @Transactional
-    public void dataSave(){
-        itemRepository.dataSave();
-    }
+
 
 }

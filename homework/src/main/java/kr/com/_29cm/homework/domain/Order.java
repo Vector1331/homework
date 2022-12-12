@@ -2,7 +2,6 @@ package kr.com._29cm.homework.domain;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Or;
 
 import javax.persistence.*;
 import java.text.DecimalFormat;

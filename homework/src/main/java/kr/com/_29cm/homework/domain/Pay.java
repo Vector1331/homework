@@ -18,6 +18,7 @@ public class Pay {
     @Column(name = "order_id")
     private Long orderId;
 
+    @Column(name = "pay_price")
     private int payPrice;
 
 

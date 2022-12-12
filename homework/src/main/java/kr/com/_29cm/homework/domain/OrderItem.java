@@ -1,6 +1,5 @@
 package kr.com._29cm.homework.domain;
 
-import kr.com._29cm.homework.exception.SoldOutException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +22,9 @@ public class OrderItem {
     @Column(name = "order_id")
     private Long orderId;
 
+    @Column(name = "order_price")
     private int orderPrice;
+    @Column(name = "count")
     private int count;
     @Transient
     private Item item;
@@ -60,13 +61,4 @@ public class OrderItem {
         log.info("{} - {}개", item.getName(), count);
     }
 
-//    public static OrderItem createOrderItem(Long pid, Long orderId, int orderPrice, int count) {
-//        OrderItem orderItem = new OrderItem();
-//        orderItem.setPid(pid);
-//        orderItem.setOrderId(orderId);
-//        orderItem.setOrderPrice(orderPrice);
-//        orderItem.setCount(count);
-//
-//        return orderItem;
-//    }
 }

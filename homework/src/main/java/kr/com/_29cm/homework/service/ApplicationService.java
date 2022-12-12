@@ -1,15 +1,10 @@
 package kr.com._29cm.homework.service;
 
-import kr.com._29cm.homework.domain.Order;
-import kr.com._29cm.homework.enumeration.OrderInput;
-import kr.com._29cm.homework.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
 import java.util.Scanner;
 
 @Slf4j
@@ -21,15 +16,11 @@ public class ApplicationService {
     private final ItemService itemService;
 
     public void run() {
-        log.info("오니");
-
         Scanner sc = new Scanner(System.in);
         String choice = "o";
 
-
-
         while(true){
-            log.info("입력(o[order]: 주문, q[quit]: 종료) : ");
+            System.out.print("입력(o[order]: 주문, q[quit]: 종료) : ");
             choice = sc.nextLine();
 
             if(StringUtils.equalsAny(choice, "o", "q", "quit")) {
