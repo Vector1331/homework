@@ -29,12 +29,20 @@ public class OrderItem {
     @Transient
     private Item item;
 
+    /**
+     * 주문 아이템에 주문하려는 아이템 추가
+     * @param item : 주문하려는 아이템
+     */
     public void changeItem(Item item) {
         this.orderItemPrice = item.getPrice();
         this.itemId = item.getId();
         this.item = item;
     }
 
+    /**
+     * 주문 아이템 주문 수량만큼 재고 감소
+     * @return 주문 아이템
+     */
     public Item removeStock() {
 
         item.changeStock(count * -1);
@@ -42,6 +50,9 @@ public class OrderItem {
         return item;
     }
 
+    /**
+     * 주문 아이템 주문 수량만큼 재고 복구
+     */
     public void addStock() {
         item.changeStock(count);
     }
@@ -53,10 +64,16 @@ public class OrderItem {
         return getOrderItemPrice() * getCount();
     }
 
+    /**
+     * 상품아이템의 order id 정보 변경
+     */
     public void changeOrderId(Long orderId) {
         this.orderId = orderId;
     }
 
+    /**
+     * 상품아이템 주문 내역 출력
+     */
     public void printOrderItem() {
         log.info("{} - {}개", item.getName(), count);
     }

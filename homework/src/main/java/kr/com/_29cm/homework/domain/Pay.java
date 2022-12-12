@@ -1,7 +1,6 @@
 package kr.com._29cm.homework.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -9,6 +8,9 @@ import javax.persistence.*;
 @Table(name = "pay")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Pay {
     @Id
     @GeneratedValue
@@ -20,10 +22,5 @@ public class Pay {
 
     @Column(name = "pay_price")
     private int payPrice;
-
-    @Transient
-    private Order order;
-
-
 
 }

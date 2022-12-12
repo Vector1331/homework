@@ -13,16 +13,15 @@ import java.util.List;
 public class ItemService {
     private final ItemRepository itemRepository;
 
-    public List<Item> findAll() {
-        return itemRepository.findAll();
-    }
-
+    /**
+     * 상품 정보 출력
+     */
     public void printAll(){
-        List<Item> items = findAll();
-        log.info("%2s \t %s %45s %6s \n", "상품번호 " , "상품명 " , "판매가격 " , "재고수 ");
+        List<Item> items = itemRepository.findAll();
+        System.out.printf("%2s \t %s %45s %6s \n", "상품번호 " , "상품명 " , "판매가격 " , "재고수 ");
         for(Item item : items) {
-            log.info(item.getId() + "\t"
-                    + item.getName()+ "\t" +  item.getPrice()+ "\t" + item.getStock());
+            log.info("{} \t {} \t {} \t {}" , item.getId(), item.getName()
+                    ,item.getPrice(), item.getStock());
         }
     }
 

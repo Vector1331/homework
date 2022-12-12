@@ -18,11 +18,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrderService {
     private final OrderRepository orderRepository;
-
     private final OrderItemRepository orderItemRepository;
     private final ItemRepository itemRepository;
+    private final PayRepository payRepository;
 
 
+    /**
+     * 주문 시작, 상품번호와 수량 입력받음
+     */
     @Transactional
     public void startOrder() {
         Scanner sc = new Scanner(System.in);
@@ -48,6 +51,10 @@ public class OrderService {
                         // 주문 아이템 저장
                         orderItems = order.getOrderItems();
                         orderItemRepository.saveAll(orderItems);
+
+                        // 결제 저장
+                        Pay pay = order.payOrder();
+                        payRepository.save(pay);
 
                         order.printOrderInfo();
                     } else {
@@ -77,6 +84,7 @@ public class OrderService {
                         Optional<Item> foundItem = itemRepository.findById(Long.valueOf(idInput));
                         if(Optional.<Item>empty() == foundItem) {
                             log.info("해당 상품은 없습니다. 다시입력해주세요");
+
                             continue;
                         }
                         OrderItem orderItem = order.addOrderItem(idInput, cntInput);
@@ -90,6 +98,7 @@ public class OrderService {
                         } catch (SoldOutException e) {
                             order.removeOrderItem(item);
                             log.error(e.getMessage());
+
                             break;
                         }
 
@@ -100,41 +109,4 @@ public class OrderService {
             }
         }
     }
-
-
-    public List<OrderItem> getOrderItems(Long orderId) {
-        return orderItemRepository.findAllByOrderId(orderId);
-    }
-
-
-    /**
-     * 비용 계산 : 주문비용, 지불비용, 배송비
-     * **/
-
-    public int getOrderPrice(Long orderId) {
-        List<OrderItem> orderItems = getOrderItems(orderId);
-        int totalPrice = 0;
-        for (OrderItem orderItem : orderItems) {
-            totalPrice += orderItem.getTotalPrice();
-        }
-        return totalPrice;
-
-    }
-
-    public int getPayPrice(Long orderId) {
-        int payPrice, shippingFee;
-        int orderPrice = getOrderPrice(orderId);
-
-        shippingFee = getShippingFee(orderPrice);
-
-        payPrice = orderPrice + shippingFee;
-        return payPrice;
-    }
-    public int getShippingFee(int orderPrice) {
-        if(orderPrice < 50000) {
-            return 2500;
-        }
-        return 0;
-    }
-
 }
