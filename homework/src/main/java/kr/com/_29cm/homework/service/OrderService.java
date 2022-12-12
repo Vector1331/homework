@@ -5,8 +5,11 @@ import kr.com._29cm.homework.exception.SoldOutException;
 import kr.com._29cm.homework.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -40,23 +43,12 @@ public class OrderService {
             cntInput = sc.nextLine();
 
             if(" ".equals(idInput) && " ".equals(cntInput)) {
-                List<OrderItem> orderItems = null;
+
                 try{
                     //주문 저장
                     boolean check = order.checkOrderItemCount();
                     if(check) {
-                        order.calcPrice();
-                        orderRepository.save(order);
-                        order.changeOrderId();
-                        // 주문 아이템 저장
-                        orderItems = order.getOrderItems();
-                        orderItemRepository.saveAll(orderItems);
-
-                        // 결제 저장
-                        Pay pay = order.payOrder();
-                        payRepository.save(pay);
-
-                        order.printOrderInfo();
+                        this.createOrder(order);
                     } else {
                         log.info("상품을 담아주세요");
                         continue;
@@ -64,13 +56,16 @@ public class OrderService {
                 } catch (Exception ex) {
                     log.error("주문에 실패했습니다. 다시 주문해주세요");
 
-                    // 주문 실패했으므로 item 재고 다시 add & save
-                    List<Item> items = orderItems.stream()
-                            .map(m -> {
-                                m.addStock();
-                                return m.getItem();
-                            }).collect(Collectors.toList());
-                    itemRepository.saveAll(items);
+                    List<OrderItem> orderItems = order.getOrderItems();
+                    if(orderItems != null) {
+                        // 주문 실패했으므로 item 재고 다시 add & save
+                        List<Item> items = orderItems.stream()
+                                .map(m -> {
+                                    m.addStock();
+                                    return m.getItem();
+                                }).collect(Collectors.toList());
+                        itemRepository.saveAll(items);
+                    }
                 }
 
                 break;
@@ -93,12 +88,14 @@ public class OrderService {
                         orderItem.changeItem(item);
 
                         try {
-                            orderItem.removeStock();
-                            itemRepository.save(item);
+                            this.reduceItemStock(orderItem);
                         } catch (SoldOutException e) {
                             order.removeOrderItem(orderItem);
                             order.resetItemStock();
-
+                            List<OrderItem> orderItemList = order.getOrderItems();
+                            for(OrderItem orderItem1 : orderItemList) {
+                                itemRepository.save(orderItem1.getItem());
+                            }
                             log.error(e.getMessage());
 
                             break;
@@ -109,6 +106,49 @@ public class OrderService {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 주문 생성
+     * @param order : 생성할 주문 정보
+     */
+    private void createOrder(Order order) {
+        order.calcPrice();
+        orderRepository.save(order);
+        order.changeOrderId();
+        // 주문 아이템 저장
+        List<OrderItem> orderItems = order.getOrderItems();
+        orderItemRepository.saveAll(orderItems);
+
+        // 결제 저장
+        Pay pay = order.payOrder();
+        payRepository.save(pay);
+
+        order.printOrderInfo();
+    }
+
+    /**
+     * 주문 아이템 재고 차감
+     *
+     * @param orderItem : 차감할 주문 아이템
+     */
+    @Transactional
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public void reduceItemStock(OrderItem orderItem) {
+
+        Long itemId = orderItem.getItemId();
+        int qty = orderItem.getCount();
+        orderItem.reduceStock();
+
+        itemRepository.reduceStock(itemId, qty);
+
+        Optional<Item> byId = itemRepository.findById(itemId);
+        Item item = byId.get();
+        log.info("########### {}", item.getStock());
+
+        if (item.getStock() < 0) {
+            throw new SoldOutException("SoldOutException 발생. 주문한 상품량이 재고량보다 큽니다.");
         }
     }
 }

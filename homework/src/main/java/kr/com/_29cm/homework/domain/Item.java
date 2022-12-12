@@ -1,15 +1,16 @@
 package kr.com._29cm.homework.domain;
 
 import kr.com._29cm.homework.exception.SoldOutException;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "item")
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Item {
     @Id
     private Long id;

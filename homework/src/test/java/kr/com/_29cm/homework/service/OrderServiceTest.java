@@ -2,84 +2,107 @@ package kr.com._29cm.homework.service;
 
 import kr.com._29cm.homework.domain.Item;
 import kr.com._29cm.homework.domain.Order;
-import kr.com._29cm.homework.repository.OrderRepository;
+import kr.com._29cm.homework.domain.OrderItem;
+import kr.com._29cm.homework.exception.SoldOutException;
+import kr.com._29cm.homework.repository.ItemRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import static org.springframework.test.util.AssertionErrors.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-@SpringBootTest
 @Transactional
+@SpringBootTest
 class OrderServiceTest {
     @Autowired
     OrderService orderService;
     @Autowired
-    OrderRepository orderRepository;
-    @Autowired
-    EntityManager em;
+    ItemRepository itemRepository;
 
 
     @Test
-    void 상품주문() throws Exception {
-        Item item = createItem( "테스트상품", 10000, 10);
+    void 주문_아이템_재고_차감() throws InterruptedException {
 
-        int orderCnt = 5;
+        int threadCount = 30;
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        int initStock = 60;
+        int orderCount = 2;
 
-        Long orderId = orderService.order(item.getId(), orderCnt);
+        Long itemId = 377169L;
 
-        Optional<Order> newOrder = orderRepository.findById(orderId);
+        for(int i = 0; i< threadCount; i++ ){
+            executorService.submit(() -> {
+                try {
+                    Optional<Item> byId = itemRepository.findById(itemId);
+                    Item item = byId.get();
+                    OrderItem oi = OrderItem.builder()
+                            .count(orderCount)
+                            .itemId(itemId)
+                            .item(item)
+                            .build();
 
-        if(newOrder != Optional.<Order>empty()) {
-            assertEquals("주문 가격은 가격 * 수량이다.", 10000 * 5, orderService.getOrderPrice(newOrder.get().getId()) );
-            assertEquals( "주문 수량만큼 재고 감수", 10-5, item.getStock());
+                    orderService.reduceItemStock(oi);
+                } catch (Exception e) {
+                   e.printStackTrace();
+                } finally {
+                    latch.countDown();
+                }
+            });
         }
+        latch.await();
 
+        Optional<Item> afterReduceOpt = itemRepository.findById(itemId);
+        Item afterReduceItem = afterReduceOpt.orElseThrow();
+        System.out.println(">>>이후 재고수량" + afterReduceItem.getStock());
+
+        assertEquals("기대되는 재고수량 : 재고 - 스레드개수 * 주문수량"
+                , afterReduceItem.getStock()
+                , initStock - threadCount * orderCount);
     }
 
     @Test
-    void 상품주문개수확인() throws Exception {
-        Item item = createItem( "테스트상품", 10000, 10);
+    void SoldOutException_상황_발생() throws InterruptedException {
+        int threadCount = 31;
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        int initStock = 60;
+        int orderCount = 2;
 
-        int orderCnt = 5;
+        Long itemId = 377169L;
 
-        Long orderId = orderService.order(item.getId(), orderCnt);
+        try {
+            for(int i = 0; i< threadCount; i++ ){
+                executorService.submit(() -> {
+                    try {
+                        Optional<Item> byId = itemRepository.findById(itemId);
+                        Item item = byId.get();
+                        OrderItem oi = OrderItem.builder()
+                                .count(orderCount)
+                                .itemId(itemId)
+                                .item(item)
+                                .build();
 
-        assertEquals("주문한 상품 종류 수가 정확해야한다.", 1, orderService.getOrderItems(orderId).size());
+                        orderService.reduceItemStock(oi);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
 
-    }
-
-    @Test
-    void 배송비확인() throws Exception {
-        Item item = createItem( "테스트상품", 10000, 10);
-        int orderCnt = 2;
-        Long orderId = orderService.order(item.getId(), orderCnt);
-        int orderPrice = orderService.getOrderPrice(orderId);
-        int payPrice = orderService.getPayPrice(orderId);
-
-        assertNotEquals("주문금액이 5만원 미만일 경우 배송비가 부과됩니다.", orderPrice, payPrice);
-        assertEquals("주문금액이 5만원 미만일 경우 배송비 2500원 부과됩니다.",orderPrice + 2500, payPrice);
-
-        Long orderId2 = orderService.order(item.getId(), 5);
-        orderPrice = orderService.getOrderPrice(orderId2);
-        payPrice = orderService.getPayPrice(orderId2);
-        assertNotEquals("주문금액이 5만원 이상일 경우 배송비 2500원이 부과되지 않습니다", orderPrice + 2500, payPrice);
-        assertEquals("주문금액이 5만원 이상일 경우 배송비는 무료입니다.", orderPrice, payPrice);
-
-
-    }
-
-    private Item createItem(String name, int price, int stock) {
-        Item item = new Item();
-        item.setName(name);
-        item.setPrice(price);
-        item.setStock(stock);
-        em.persist(item);
-        return item;
+            latch.await();
+        } catch (Exception e) {
+            assertEquals("Sold Out", e, SoldOutException.class);
+        }
     }
 }

@@ -43,7 +43,7 @@ public class OrderItem {
      * 주문 아이템 주문 수량만큼 재고 감소
      * @return 주문 아이템
      */
-    public Item removeStock() {
+    public Item reduceStock() {
 
         item.changeStock(count * -1);
 
