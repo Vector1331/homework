@@ -96,7 +96,9 @@ public class OrderService {
                             orderItem.removeStock();
                             itemRepository.save(item);
                         } catch (SoldOutException e) {
-                            order.removeOrderItem(item);
+                            order.removeOrderItem(orderItem);
+                            order.resetItemStock();
+
                             log.error(e.getMessage());
 
                             break;

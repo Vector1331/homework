@@ -79,10 +79,18 @@ public class Order {
      * 주문아이템 제거
      * @param item : 제거하려는 아이템
      */
-    public void removeOrderItem(Item item) {
+    public void removeOrderItem(OrderItem item) {
         orderItems.remove(item);
     }
 
+    /**
+     * 재고 복구
+     */
+    public void resetItemStock() {
+        for(OrderItem orderItem : orderItems) {
+            orderItem.addStock();
+        }
+    }
 
     /**
      * 주문 내역 출력 : 주문금액, 배송비(있을 경우), 지불금액
@@ -149,4 +157,6 @@ public class Order {
 
         return pay;
     }
+
+
 }
