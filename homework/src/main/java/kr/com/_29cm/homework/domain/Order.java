@@ -24,8 +24,8 @@ public class Order {
     @Column(name = "pay_id")
     private Long payId;
 
-    @Column(name = "total_price")
-    private int totalPrice;
+    @Column(name = "order_price")
+    private int orderPrice;
 
     @Column(name = "delivery_fee")
     private int deliveryFee;
@@ -83,14 +83,14 @@ public class Order {
             orderItem.printOrderItem();
         }
         log.info("---------------------------------------");
-        log.info("주문 금액 : {} 원", decimalFormat.format(totalPrice) );
+        log.info("주문 금액 : {} 원", decimalFormat.format(orderPrice) );
 
         if(deliveryFee > 0){
             log.info("배송비 : {} 원" ,decimalFormat.format(deliveryFee) );
         }
 
         log.info("---------------------------------------");
-        log.info("지불 금액 : {} 원" ,  decimalFormat.format(totalPrice + deliveryFee)) ;
+        log.info("지불 금액 : {} 원" ,  decimalFormat.format(orderPrice + deliveryFee)) ;
         log.info("---------------------------------------");
 
     }
@@ -102,20 +102,15 @@ public class Order {
     private void calcTotalPrice() {
         if(checkOrderItemCount()){
             for (OrderItem orderItem : orderItems) {
-                totalPrice += orderItem.getOrderPrice() * orderItem.getCount();
+                orderPrice += orderItem.getOrderItemPrice() * orderItem.getCount();
             }
         } else {
-            totalPrice = 0;
+            orderPrice = 0;
         }
     }
 
     private int calcDeliveryFee() {
-        return totalPrice < 50000 ? 2500 : 0;
+        return orderPrice < 50000 ? 2500 : 0;
     }
 
-   /* public void order() {
-        for (int i = 0; i < orderItems.size(); i++) {
-            orderItems.get(i).setOrderId(this.id);
-        }
-    }*/
 }

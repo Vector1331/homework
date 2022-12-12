@@ -22,15 +22,15 @@ public class OrderItem {
     @Column(name = "order_id")
     private Long orderId;
 
-    @Column(name = "order_price")
-    private int orderPrice;
+    @Column(name = "order_item_price")
+    private int orderItemPrice;
     @Column(name = "count")
     private int count;
     @Transient
     private Item item;
 
     public void changeItem(Item item) {
-        this.orderPrice = item.getPrice();
+        this.orderItemPrice = item.getPrice();
         this.itemId = item.getId();
         this.item = item;
     }
@@ -50,7 +50,7 @@ public class OrderItem {
      * 주문 아이템 가격  = 상품가격 * 주문 수
      * */
     public int getTotalPrice() {
-        return getOrderPrice() * getCount();
+        return getOrderItemPrice() * getCount();
     }
 
     public void changeOrderId(Long orderId) {

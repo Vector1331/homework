@@ -21,6 +21,9 @@ public class Pay {
     @Column(name = "pay_price")
     private int payPrice;
 
+    @Transient
+    private Order order;
+
 
 
 }
