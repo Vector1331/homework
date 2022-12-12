@@ -70,7 +70,6 @@ public class Order {
     }
 
     public void removeOrderItem(Item item) {
-        // TODo : list 사라지는지 확인!!@!
         orderItems.remove(item);
     }
 

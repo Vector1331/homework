@@ -72,13 +72,14 @@ public class OrderService {
                     log.info("잘못된 주문정보입니다. 다시 입력해주세요");
                 } else {
                     if (idInput.matches("^[0-9]*$") && cntInput.matches("^[0-9]*$")) {
-                        OrderItem orderItem = order.addOrderItem(idInput, cntInput);
+
                         // item Id  아이템 조회 > 그 아이템 OrderItem set
                         Optional<Item> foundItem = itemRepository.findById(Long.valueOf(idInput));
                         if(Optional.<Item>empty() == foundItem) {
                             log.info("해당 상품은 없습니다. 다시입력해주세요");
                             continue;
                         }
+                        OrderItem orderItem = order.addOrderItem(idInput, cntInput);
                         Item item = foundItem.get();
 
                         orderItem.changeItem(item);
@@ -89,6 +90,7 @@ public class OrderService {
                         } catch (SoldOutException e) {
                             order.removeOrderItem(item);
                             log.error(e.getMessage());
+                            break;
                         }
 
                     } else {
